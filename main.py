@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-
+import numpy as np
 
 name = requests.get('https://finance.yahoo.com/trending-tickers' ,headers ={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'})
 data1 = pd.read_html(name.text)
@@ -15,9 +15,12 @@ def datagetter(link):
         close = data[['Close*']]
         return close
 
-def
-
 tesla = (datagetter('https://finance.yahoo.com/quote/TSLA/history?p=TSLA'))
 
-tesla =  tesla.values.tolist()
-print(tesla)
+tesla = tesla.values.tolist()
+del tesla[-1]
+ema = 0
+for x in tesla[0:12]:
+        ema += x
+        print(ema)
+
