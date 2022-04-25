@@ -19,8 +19,14 @@ tesla = (datagetter('https://finance.yahoo.com/quote/TSLA/history?p=TSLA'))
 
 tesla = tesla.values.tolist()
 del tesla[-1]
-ema = 0
+print(tesla)
+sma = 0
 for x in tesla[0:12]:
-        ema += x
-        print(ema)
+        str1 = ''.join(x)
+        str1 = float(str1)
+        sma += str1
+
+
+sma = sma / 12
+print(sma)
 
