@@ -16,14 +16,24 @@ def datagetter(link):
         data = data[0]
         close = data[['Close*']]
         return close
+print("which ticker")
+ticker = input()
+ticker = ticker.upper()
 
-tesla = (datagetter('https://finance.yahoo.com/quote/TSLA/history?p=TSLA'))
+link = 'https://finance.yahoo.com/quote/TSLA/history?p=TSLA'
+link = link.replace("TSLA", ticker )
+
+tesla = (datagetter(link))
 
 tesla = tesla.values.tolist()
 del tesla[-1]
 
-for x in enumerate(tesla):
-        print(x)
+pricelist = []
+
+for count, x in enumerate(tesla):
+        str1 = ''.join(x)
+        str1 = float(str1)
+        pricelist.append(str1)
 
 ema = 0
 ema2 = 0
@@ -31,8 +41,8 @@ ema2 = 0
 l = []
 l2 = []
 
-tsma = tesla[0:61]
-tsma2 = tesla[0:61]
+tsma = tesla[0:93]
+tsma2 = tesla[0:93]
 
 tsma = tsma[::-1]
 tsma2 = tsma2[::-1]
@@ -58,14 +68,12 @@ for count, x in enumerate(tsma2):
 l = l[::-1]
 l2 = l2[::-1]
 
-print(l)
-print(l2)
 
 macd = []
 for x, y in zip(l,l2):
         macd.append(x-y)
 
-macd = macd[0:61]
+macd = macd[0:93]
 macd = macd[::-1]
 
 print(macd)
@@ -79,19 +87,96 @@ for count, x in enumerate(macd):
 
 print(signalline)
 
-x = np.array([i for i in range(61)])
 
-X_Y_Spline1 = make_interp_spline(x, macd)
+dif = []
+for x, y in zip(macd, signalline):
+        verschil = x - y
+        dif.append(verschil)
 
-X_1 = np.linspace(x.min(), x.max(), 50)
-Y_1 = X_Y_Spline1(X_1)
+print(dif)
 
-plt.plot(X_1, Y_1)
+buyorsell = []
 
-X_Y_Spline = make_interp_spline(x, signalline)
+for count, x in enumerate(dif):
+        if x > 0 and dif[count-1] < 0:
+                buyorsell.append(1)
+        elif x < 0  and dif[count-1] > 0:
+                buyorsell.append(0)
+        elif x < 0 and dif[count - 1] < 0:
+                buyorsell.append(2)
+        elif x > 0 and dif[count - 1] > 0:
+                buyorsell.append(2)
 
-X_ = np.linspace(x.min(), x.max(), 50)
-Y_ = X_Y_Spline(X_)
 
-plt.plot(X_, Y_)
+
+l = l[::-1]
+l2 = l2[::-1]
+
+print(l)
+print(l2)
+
+print(buyorsell)
+pricelist = pricelist[::-1]
+
+print(pricelist)
+
+portfoliohistory = []
+
+portfolio = 1000
+stock = 0
+z = 0
+last = 0
+for x, y in zip(buyorsell, pricelist):
+        if x == 2:
+                y = y
+                portfolio = portfolio
+                stock = stock
+        elif x == 0:
+                stock = portfolio / y
+                portfolio = 0
+        elif x == 1:
+            if stock == 0:
+                portfolio = portfolio
+            else:
+                portfolio = stock * y
+                stock = 0
+        z += 1
+
+        if portfolio > 0:
+                portfoliohistory.append(portfolio)
+                last = portfolio
+        elif portfolio < 0:
+                portfoliohistory.append(portfolio)
+        print("day", z)
+        print("actie", x)
+        print("hoeveel stocks", stock)
+        print("portfolio doeks",portfolio)
+
+
+
+
+
+
+print(portfoliohistory)
+
+
+x2 = np.array([i for i in range(len(portfoliohistory))])
+
+profit = []
+
+for x in portfoliohistory:
+    profit.append(x - 1000)
+
+print(profit)
+X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
+
+X_2 = np.linspace(x2.min(), x2.max(), 50)
+Y_2 = X_Y_Spline2(X_2)
+
+X_Y_Spline3 = make_interp_spline(x2, profit)
+
+Y_3 = X_Y_Spline3(X_2)
+
+plt.plot(X_2, Y_2)
+plt.plot(X_2,Y_3)
 plt.show()
