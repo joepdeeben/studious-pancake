@@ -4,179 +4,270 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline, BSpline
 
-name = requests.get('https://finance.yahoo.com/trending-tickers' ,headers ={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'})
-data1 = pd.read_html(name.text)
-data1 = data1[0]
-names = data1[['Symbol']]
+n = []
+print('how many tickers?')
 
+tickerscount = int(input())
+for x in range(tickerscount):
+    print('enter ticker')
+    tick = input()
+    n.append(tick)
 
-def datagetter(link):
-        r = requests.get(link ,headers ={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'})
+for x in n:
+    def datagetter(link):
+        r = requests.get(link, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'})
         data = pd.read_html(r.text)
         data = data[0]
         close = data[['Close*']]
         return close
-print("which ticker")
-ticker = input()
-ticker = ticker.upper()
 
-link = 'https://finance.yahoo.com/quote/TSLA/history?p=TSLA'
-link = link.replace("TSLA", ticker )
 
-tesla = (datagetter(link))
+    link = 'https://finance.yahoo.com/quote/TSLA/history?p=TSLA'
+    link = link.replace("TSLA", x)
 
-tesla = tesla.values.tolist()
-del tesla[-1]
+    tesla = (datagetter(link))
 
-pricelist = []
+    tesla = tesla.values.tolist()
+    del tesla[-1]
 
-for count, x in enumerate(tesla):
+    pricelist = []
+
+    for count, x in enumerate(tesla):
         str1 = ''.join(x)
         str1 = float(str1)
         pricelist.append(str1)
 
-ema = 0
-ema2 = 0
+    ema = 0
+    ema2 = 0
 
-l = []
-l2 = []
+    l = []
+    l2 = []
+    pricelist2 = pricelist[0:93]
+    tsma = tesla[0:93]
+    tsma2 = tesla[0:93]
+    pricelist2 = pricelist2[::-1]
+    tsma = tsma[::-1]
+    tsma2 = tsma2[::-1]
 
-tsma = tesla[0:93]
-tsma2 = tesla[0:93]
 
-tsma = tsma[::-1]
-tsma2 = tsma2[::-1]
+    #calculate rsi
+    counter = 0
+    fe = 7
+    le = 14
 
-#calculates the 12 period ema
-for count, x in enumerate(tsma):
+    avgp = []
+    avgl = []
+    avgloss = 0
+    avgprofit = 0
+
+
+    print(pricelist2)
+
+
+    for count, x in enumerate(pricelist2[0:7]):
+        if x > pricelist2[count - 1]:
+            avgprofit += (x / pricelist2[count - 1])
+        elif x < pricelist2[count - 1]:
+            avgloss += (pricelist2[count - 1] / x)
+    avgp.append(avgprofit / 7)
+    avgl.append(avgloss / 7)
+    avgprofit = 0
+    avgloss = 0
+
+    while counter < ((len(pricelist2) / 7) - 7):
+       for count, x in enumerate(pricelist2[fe:le]):
+           if x > pricelist2[count-1]:
+               avgp.append((avgp[-1] * 7 + (((x / pricelist2[count-1]) - 1) * 100)) / 7)
+               avgl.append(0)
+           elif x < pricelist2[count-1]:
+               avgl.append((avgl[-1] * 7 + (((pricelist2[count-1] / x) - 1) * 100)) / 7)
+               avgp.append(0)
+       counter += 1
+       fe += 7
+       le += 7
+
+
+
+    print(avgp,avgl)
+
+
+
+
+
+
+
+
+
+
+
+
+    gd = pricelist[0] / pricelist[-1]
+    print(gd)
+
+
+
+    # calculates the 12 period ema
+    for count, x in enumerate(tsma):
         str1 = ''.join(x)
         str1 = float(str1)
-        str2 = ''.join(tsma[count-1])
+        str2 = ''.join(tsma[count - 1])
         str2 = float(str2)
         ema1 = (str1 * 0.15384615384) + (str2 * (1 - 0.15384615384))
         l.append(ema1)
 
-#calculates the 26 period ema
-for count, x in enumerate(tsma2):
+    # calculates the 26 period ema
+    for count, x in enumerate(tsma2):
         str1 = ''.join(x)
         str1 = float(str1)
-        str2 = ''.join(tsma2[count-1])
+        str2 = ''.join(tsma2[count - 1])
         str2 = float(str2)
         ema2 = (str1 * 0.07407407407) + (str2 * (1 - 0.07407407407))
         l2.append(ema2)
 
-l = l[::-1]
-l2 = l2[::-1]
+    l = l[::-1]
+    l2 = l2[::-1]
 
+    macd = []
+    for x, y in zip(l, l2):
+        macd.append(x - y)
 
-macd = []
-for x, y in zip(l,l2):
-        macd.append(x-y)
+    macd = macd[0:93]
+    macd = macd[::-1]
 
-macd = macd[0:93]
-macd = macd[::-1]
+    print(macd)
 
-print(macd)
+    signalline = []
 
-signalline = []
-
-for count, x in enumerate(macd):
-        str4 = macd[count-1]
+    for count, x in enumerate(macd):
+        str4 = macd[count - 1]
         ema2 = (x * 0.2) + (str4 * (1 - 0.2))
         signalline.append(ema2)
 
-print(signalline)
+    print(signalline)
 
-
-dif = []
-for x, y in zip(macd, signalline):
+    dif = []
+    for x, y in zip(macd, signalline):
         verschil = x - y
         dif.append(verschil)
 
-print(dif)
+    print(dif)
 
-buyorsell = []
-
-for count, x in enumerate(dif):
-        if x > 0 and dif[count-1] < 0:
-                buyorsell.append(1)
-        elif x < 0  and dif[count-1] > 0:
+    buyorsell = []
+    if gd > 1.3:
+        for count, x in enumerate(dif):
+            if x < 0 and dif[count - 1] > 0:
                 buyorsell.append(0)
-        elif x < 0 and dif[count - 1] < 0:
+            elif x < 0 and dif[count - 1] < 0:
                 buyorsell.append(2)
-        elif x > 0 and dif[count - 1] > 0:
+            elif x > 0 and dif[count - 1] > 0:
+                buyorsell.append(2)
+    elif gd < 0.7:
+        for count, x in enumerate(dif):
+            if x > 0 and dif[count - 1] < 0:
+                buyorsell.append(1)
+            elif x < 0 and dif[count - 1] < 0:
+                buyorsell.append(2)
+            elif x > 0 and dif[count - 1] > 0:
+                buyorsell.append(2)
+    else:
+        for count, x in enumerate(dif):
+            if x < 0 and dif[count - 1] > 0:
+                buyorsell.append(0)
+            elif x > 0 and dif[count - 1] < 0:
+                buyorsell.append(1)
+            elif x < 0 and dif[count - 1] < 0:
+                buyorsell.append(2)
+            elif x > 0 and dif[count - 1] > 0:
                 buyorsell.append(2)
 
+    l = l[::-1]
+    l2 = l2[::-1]
 
+    print(l)
+    print(l2)
 
-l = l[::-1]
-l2 = l2[::-1]
+    print(buyorsell)
+    pricelist = pricelist[::-1]
 
-print(l)
-print(l2)
+    print(pricelist)
 
-print(buyorsell)
-pricelist = pricelist[::-1]
+    portfoliohistory = []
 
-print(pricelist)
-
-portfoliohistory = []
-
-portfolio = 1000
-stock = 0
-z = 0
-last = 0
-for x, y in zip(buyorsell, pricelist):
+    portfolio = 1000
+    stock = 0
+    shortstock = 0
+    buyprice = 0
+    z = 0
+    last = 0
+    for x, y in zip(buyorsell, pricelist):
         if x == 2:
-                y = y
-                portfolio = portfolio
-                stock = stock
+            y = y
+            portfolio = portfolio
+            stock = stock
         elif x == 0:
+            if shortstock > 0:
+                portfolio = shortstock * (buyprice * (buyprice / y))
+                shortstock = 0
                 stock = portfolio / y
                 portfolio = 0
+            elif stock == 0:
+                stock = portfolio / y
+                portfolio = 0
+            else:
+                stock = stock
         elif x == 1:
-            if stock == 0:
+            if stock == 0 and portfolio == 0:
                 portfolio = portfolio
             else:
-                portfolio = stock * y
-                stock = 0
+                if portfolio == 0:
+                    portfolio = stock * y
+                    stock = 0
+                    shortstock = portfolio / y
+                    portfolio = 0
+                    buyprice = y
+                else:
+                    shortstock = portfolio / y
+                    portfolio = 0
+                    buyprice = y
+
         z += 1
 
         if portfolio > 0:
-                portfoliohistory.append(portfolio)
-                last = portfolio
-        elif portfolio < 0:
-                portfoliohistory.append(portfolio)
+            portfoliohistory.append(portfolio)
+            last = portfolio
+        elif portfolio == 0:
+            if shortstock > 0:
+                portvalue = shortstock * (buyprice * (buyprice / y))
+                portfoliohistory.append(portvalue)
+            else:
+                portvalue = stock * y
+                portfoliohistory.append(portvalue)
         print("day", z)
         print("actie", x)
         print("hoeveel stocks", stock)
-        print("portfolio doeks",portfolio)
+        print("hoeveelheid shortstocks", shortstock)
+        print("portfolio doeks", portfolio)
 
+    x2 = np.array([i for i in range(len(portfoliohistory))])
 
+    profit = []
 
+    for x in portfoliohistory:
+        profit.append(x)
 
+    print(profit)
+    X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
 
+    X_2 = np.linspace(x2.min(), x2.max(), 50)
+    Y_2 = X_Y_Spline2(X_2)
 
-print(portfoliohistory)
+    X_Y_Spline3 = make_interp_spline(x2, profit)
 
+    Y_3 = X_Y_Spline3(X_2)
 
-x2 = np.array([i for i in range(len(portfoliohistory))])
-
-profit = []
-
-for x in portfoliohistory:
-    profit.append(x - 1000)
-
-print(profit)
-X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
-
-X_2 = np.linspace(x2.min(), x2.max(), 50)
-Y_2 = X_Y_Spline2(X_2)
-
-X_Y_Spline3 = make_interp_spline(x2, profit)
-
-Y_3 = X_Y_Spline3(X_2)
-
-plt.plot(X_2, Y_2)
-plt.plot(X_2,Y_3)
+    plt.plot(X_2, Y_2)
+    plt.plot(X_2, Y_3)
+plt.legend(n)
 plt.show()
+
