@@ -40,16 +40,11 @@ for x in n:
 
     ema = 0
     ema2 = 0
-
-    l = []
-    l2 = []
-    pricelist2 = pricelist[0:93]
-    tsma = tesla[0:93]
-    tsma2 = tesla[0:93]
-    pricelist2 = pricelist2[::-1]
-    tsma = tsma[::-1]
-    tsma2 = tsma2[::-1]
-
+    print(len(pricelist))
+    pricelist = pricelist[0:93]
+    pricelist = pricelist[::-1]
+    l = [pricelist[0]]
+    l2 = [pricelist[0]]
 
     #calculate rsi
     counter = 0
@@ -62,26 +57,26 @@ for x in n:
     avgprofit = 0
 
 
-    print(pricelist2)
+    print(pricelist)
 
 
-    for count, x in enumerate(pricelist2[0:7]):
-        if x > pricelist2[count - 1]:
-            avgprofit += (x / pricelist2[count - 1])
-        elif x < pricelist2[count - 1]:
-            avgloss += (pricelist2[count - 1] / x)
+    for count, x in enumerate(pricelist[0:7]):
+        if x > pricelist[count - 1]:
+            avgprofit += (x / pricelist[count - 1])
+        elif x < pricelist[count - 1]:
+            avgloss += (pricelist[count - 1] / x)
     avgp.append(avgprofit / 7)
     avgl.append(avgloss / 7)
     avgprofit = 0
     avgloss = 0
 
-    while counter < ((len(pricelist2) / 7) - 7):
-       for count, x in enumerate(pricelist2[fe:le]):
-           if x > pricelist2[count-1]:
-               avgp.append((avgp[-1] * 7 + (((x / pricelist2[count-1]) - 1) * 100)) / 7)
+    while counter < ((len(pricelist) / 7) - 7):
+       for count, x in enumerate(pricelist[fe:le]):
+           if x > pricelist[count-1]:
+               avgp.append((avgp[-1] * 7 + (((x / pricelist[count-1]) - 1) * 100)) / 7)
                avgl.append(0)
-           elif x < pricelist2[count-1]:
-               avgl.append((avgl[-1] * 7 + (((pricelist2[count-1] / x) - 1) * 100)) / 7)
+           elif x < pricelist[count-1]:
+               avgl.append((avgl[-1] * 7 + (((pricelist[count-1] / x) - 1) * 100)) / 7)
                avgp.append(0)
        counter += 1
        fe += 7
@@ -89,7 +84,7 @@ for x in n:
 
 
 
-    print(avgp,avgl)
+
 
 
 
@@ -103,49 +98,44 @@ for x in n:
 
 
     gd = pricelist[0] / pricelist[-1]
-    print(gd)
+
 
 
 
     # calculates the 12 period ema
-    for count, x in enumerate(tsma):
-        str1 = ''.join(x)
-        str1 = float(str1)
-        str2 = ''.join(tsma[count - 1])
-        str2 = float(str2)
+    for count, x in enumerate(pricelist):
+        str1 = x
+        str2 = l[count]
         ema1 = (str1 * 0.15384615384) + (str2 * (1 - 0.15384615384))
         l.append(ema1)
 
     # calculates the 26 period ema
-    for count, x in enumerate(tsma2):
-        str1 = ''.join(x)
-        str1 = float(str1)
-        str2 = ''.join(tsma2[count - 1])
-        str2 = float(str2)
+    for count, x in enumerate(pricelist):
+        str1 = x
+        str2 = (l2[count])
         ema2 = (str1 * 0.07407407407) + (str2 * (1 - 0.07407407407))
         l2.append(ema2)
-
-    l = l[::-1]
-    l2 = l2[::-1]
+    print(l)
+    print(l2)
 
     macd = []
     for x, y in zip(l, l2):
         macd.append(x - y)
 
-    macd = macd[0:93]
-    macd = macd[::-1]
+
+
 
     print(macd)
-
-    signalline = []
+    signalline = [macd[0]]
 
     for count, x in enumerate(macd):
-        str4 = macd[count - 1]
+        str4 = signalline[count]
         ema2 = (x * 0.2) + (str4 * (1 - 0.2))
         signalline.append(ema2)
 
-    print(signalline)
 
+    signalline = signalline[1:]
+    print(signalline)
     dif = []
     for x, y in zip(macd, signalline):
         verschil = x - y
@@ -154,43 +144,18 @@ for x in n:
     print(dif)
 
     buyorsell = []
-    if gd > 1.3:
-        for count, x in enumerate(dif):
-            if x < 0 and dif[count - 1] > 0:
-                buyorsell.append(0)
-            elif x < 0 and dif[count - 1] < 0:
-                buyorsell.append(2)
-            elif x > 0 and dif[count - 1] > 0:
-                buyorsell.append(2)
-    elif gd < 0.7:
-        for count, x in enumerate(dif):
-            if x > 0 and dif[count - 1] < 0:
-                buyorsell.append(1)
-            elif x < 0 and dif[count - 1] < 0:
-                buyorsell.append(2)
-            elif x > 0 and dif[count - 1] > 0:
-                buyorsell.append(2)
-    else:
-        for count, x in enumerate(dif):
-            if x < 0 and dif[count - 1] > 0:
-                buyorsell.append(0)
-            elif x > 0 and dif[count - 1] < 0:
-                buyorsell.append(1)
-            elif x < 0 and dif[count - 1] < 0:
-                buyorsell.append(2)
-            elif x > 0 and dif[count - 1] > 0:
-                buyorsell.append(2)
 
-    l = l[::-1]
-    l2 = l2[::-1]
-
-    print(l)
-    print(l2)
+    for count, x in enumerate(dif):
+        if x > 0 and dif[count - 1] > 0 and dif[count - 2] < 0:
+            buyorsell.append(0)
+        elif x < 0 and dif[count - 1] > 0:
+            buyorsell.append(1)
+        elif x < 0 and dif[count - 1] < 0:
+            buyorsell.append(1)
+        elif x > 0 and dif[count - 1] > 0:
+            buyorsell.append(2)
 
     print(buyorsell)
-    pricelist = pricelist[::-1]
-
-    print(pricelist)
 
     portfoliohistory = []
 
