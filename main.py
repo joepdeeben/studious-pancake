@@ -35,9 +35,11 @@ for x in n:
 
     for count, x in enumerate(tesla):
         str1 = ''.join(x)
-        str1 = float(str1)
-        pricelist.append(str1)
-
+        try:
+          str1 = float(str1)
+          pricelist.append(str1)
+        except ValueError:
+           pass
     ema = 0
     ema2 = 0
     print(len(pricelist))
