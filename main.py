@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import make_interp_spline, BSpline
+from scipy.interpolate import make_interp_spline
 
 n = []
 print('how many tickers?')
@@ -17,17 +17,16 @@ for x in n:
     def datagetter(link):
         r = requests.get(link, headers={
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'})
-        data = pd.read_html(r.text)
-        data = data[0]
-        close = data[['Close*']]
-        return close
+        data = pd.read_json(r.text)
+        return data
 
 
-    link = 'https://finance.yahoo.com/quote/TSLA/history?p=TSLA'
-    link = link.replace("TSLA", x)
-
+    link = 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=P4RUXA3BDANTJHOH'
+    link = link.replace("IBM", x)
     tesla = (datagetter(link))
-
+    tesla = pd.DataFrame(tesla)
+    tesla = tesla.iloc[6:99, :]
+    print(tesla["Time Series (5min)"])
     tesla = tesla.values.tolist()
     del tesla[-1]
 
