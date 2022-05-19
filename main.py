@@ -7,6 +7,24 @@ import time
 
 n = []
 print('how many tickers?')
+portfolio = 1000
+stock = 0
+shortstock = 0
+buyprice = 0
+
+class calcs:
+    def __init__(self, pricelist, period):
+        self.pricelist = pricelist
+        self.k = (2 / period+1)
+        self.emalist = [self.pricelist[0]]
+
+    def ema(self):
+        for count, x in enumerate(self.pricelist):
+            str1 = x
+            str2 = self.emalist[count]
+            ema1 = (str1 * self.k) + (str2 * (1 - self.k))
+            self.emalist.append(ema1)
+        return self.emalist
 
 
 
@@ -33,12 +51,12 @@ for x in n:
 
     tesla = []
     price = []
-    for x in range(52):
+    for x in range(200):
         price = (datagetter(link))
         price = price.values.tolist()
         tesla.append(price[0])
         time.sleep(0.5)
-        print(x + 1, tesla).
+        print(x + 1, tesla)
     looper = 1
 
 
@@ -46,9 +64,9 @@ for x in n:
         time.sleep(0.5)
         price = (datagetter(link))
         price = price.values.tolist()
-        del tesla[-1]
+        del tesla[0]
         tesla.append(price[0])
-
+        print(tesla)
 
 
         pricelist = []
@@ -61,35 +79,26 @@ for x in n:
               pricelist.append(str1)
             except ValueError:
                pass
-        ema = 0
-        ema2 = 0
         print(len(pricelist))
-        pricelist = pricelist[0:52]
+        pricelist = pricelist[0:200]
         pricelist = pricelist[::-1]
-        l = [pricelist[0]]
-        l2 = [pricelist[0]]
 
-        #print(pricelist)
-
-
-        gd = pricelist[0] / pricelist[-1]
 
 
         # calculates the 12 period ema
-        for count, x in enumerate(pricelist):
-            str1 = x
-            str2 = l[count]
-            ema1 = (str1 * 0.15384615384) + (str2 * (1 - 0.15384615384))
-            l.append(ema1)
+        list1 = calcs(pricelist, 12)
+        l = list1.ema()
+        print(l)
 
-        # calculates the 26 period ema
-        for count, x in enumerate(pricelist):
-            str1 = x
-            str2 = l2[count]
-            ema2 = (str1 * 0.07407407407) + (str2 * (1 - 0.07407407407))
-            l2.append(ema2)
-        #print(l)
-        #print(l2)
+        #calculates the 26 period ema
+        list2 = calcs(pricelist, 26)
+        l2 = list2.ema()
+        print(l2)
+
+        #calulates 200 period ema
+        list3 = calcs(pricelist, 200)
+        l3 = list3.ema()
+        print(l3)
 
         macd = []
         for x, y in zip(l, l2):
@@ -117,28 +126,28 @@ for x in n:
         #print(dif)
 
         buyorsell = []
-
-        for count, x in enumerate(dif):
-            if x > 0 and dif[count - 1] > 0 and dif[count - 2] < 0:
+        print(buyorsell)
+        print(l3)
+        print(pricelist)
+        for count, (x, y, z) in enumerate(zip(dif, l3, pricelist)):
+            if x > 0 and dif[count - 1] < 0 and z > y:
                 buyorsell.append(0)
             elif x < 0 and dif[count - 1] > 0:
                 buyorsell.append(1)
-            elif x < 0 and dif[count - 1] < 0:
-                buyorsell.append(1)
-            elif x > 0 and dif[count - 1] > 0:
+            else:
                 buyorsell.append(2)
 
         #print(buyorsell)
 
         portfoliohistory = []
-
-        portfolio = 1000
-        stock = 0
-        shortstock = 0
-        buyprice = 0
+        print(dif)
+        print(buyorsell)
+        print(len(buyorsell))
         z = 0
         last = 0
-        for x, y in zip(buyorsell, pricelist):
+        for i in range(1):
+            x = buyorsell[-1]
+            y = pricelist[-1]
             if x == 2:
                 y = y
                 portfolio = portfolio
@@ -181,20 +190,20 @@ for x in n:
                 else:
                     portvalue = stock * y
                     portfoliohistory.append(portvalue)
-            # print("day", z)
-            # print("actie", x)
-            # print("hoeveel stocks", stock)
-            # print("hoeveelheid shortstocks", shortstock)
-            # print("portfolio doeks", portfolio)
+            print("day", z)
+            print("actie", x)
+            print("hoeveel stocks", stock)
+            print("hoeveelheid shortstocks", shortstock)
+            print("portfolio doeks", portfoliohistory)
 
-        x2 = np.array([i for i in range(len(portfoliohistory))])
+        #x2 = np.array([i for i in range(len(portfoliohistory))])
 
         profit = []
 
-        for x in portfoliohistory:
-            profit.append(x)
+        #for x in portfoliohistory:
+            #profit.append(x)
 
-        print(portfoliohistory[-1])
+        #print(portfoliohistory)
         # X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
         #
         # X_2 = np.linspace(x2.min(), x2.max(), 50)
