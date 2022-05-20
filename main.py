@@ -14,8 +14,9 @@ buyprice = 0
 
 class calcs:
     def __init__(self, pricelist, period):
+        self.period = period
         self.pricelist = pricelist
-        self.k = (2 / period+1)
+        self.k = (2 / (self.period + 1))
         self.emalist = [self.pricelist[0]]
 
     def ema(self):
@@ -55,13 +56,12 @@ for x in n:
         price = (datagetter(link))
         price = price.values.tolist()
         tesla.append(price[0])
-        time.sleep(0.5)
+        time.sleep(10)
         print(x + 1, tesla)
     looper = 1
 
-
     while looper < 2:
-        time.sleep(0.5)
+        time.sleep(10)
         price = (datagetter(link))
         price = price.values.tolist()
         del tesla[0]
@@ -79,10 +79,9 @@ for x in n:
               pricelist.append(str1)
             except ValueError:
                pass
-        print(len(pricelist))
-        pricelist = pricelist[0:200]
+        pricelist = pricelist[0:93]
         pricelist = pricelist[::-1]
-
+        print(pricelist)
 
 
         # calculates the 12 period ema
@@ -132,8 +131,12 @@ for x in n:
         for count, (x, y, z) in enumerate(zip(dif, l3, pricelist)):
             if x > 0 and dif[count - 1] < 0 and z > y:
                 buyorsell.append(0)
-            elif x < 0 and dif[count - 1] > 0:
+            elif x < 0 and dif[count - 1] > 0 and dif[count - 2] > 0 and z > y:
                 buyorsell.append(1)
+            if x < 0 and dif[count - 1] > 0 and z < y:
+                buyorsell.append(1)
+            elif x > 0 and dif[count - 1] < 0 and dif[count - 2] < 0 and z < y:
+                buyorsell.append(0)
             else:
                 buyorsell.append(2)
 
