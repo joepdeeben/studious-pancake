@@ -51,17 +51,17 @@ for x in n:
 
     tesla = []
     price = []
-    for x in range(200):
+    for x in range(100):
         price = (datagetter(link))
         price = price.values.tolist()
         tesla.append(price[0])
-        time.sleep(0.5)
+        time.sleep(5)
         print(x + 1, tesla)
     looper = 1
 
 
     while looper < 2:
-        time.sleep(0.5)
+        time.sleep(5)
         price = (datagetter(link))
         price = price.values.tolist()
         del tesla[0]
@@ -80,7 +80,7 @@ for x in n:
             except ValueError:
                pass
         print(len(pricelist))
-        pricelist = pricelist[0:200]
+        pricelist = pricelist[0:100]
         pricelist = pricelist[::-1]
 
 
@@ -96,7 +96,7 @@ for x in n:
         print(l2)
 
         #calulates 200 period ema
-        list3 = calcs(pricelist, 200)
+        list3 = calcs(pricelist, 50)
         l3 = list3.ema()
         print(l3)
 
@@ -132,8 +132,12 @@ for x in n:
         for count, (x, y, z) in enumerate(zip(dif, l3, pricelist)):
             if x > 0 and dif[count - 1] < 0 and z > y:
                 buyorsell.append(0)
-            elif x < 0 and dif[count - 1] > 0:
+            elif x < 0 and dif[count - 1] > 0 and dif[count - 2] > 0 and z > y:
                 buyorsell.append(1)
+            elif x < 0 and dif[count - 1] > 0 and dif[count - 2] > 0 and z < y:
+                buyorsell.append(1)
+            elif x > 0 and dif[count - 1] < 0 and dif[count - 2] < 0 and dif[count - 3] < 0 and z < y:
+                buyorsell.append(0)
             else:
                 buyorsell.append(2)
 
