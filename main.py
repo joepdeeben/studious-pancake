@@ -8,9 +8,8 @@ import time
 n = []
 print('how many tickers?')
 portfolio = 1000
-stock = 0
-shortstock = 0
 buyprice = 0
+stock = 0
 
 class calcs:
     def __init__(self, pricelist, period):
@@ -26,6 +25,39 @@ class calcs:
             self.emalist.append(ema1)
         return self.emalist
 
+class actions:
+    def __init__(self, buyprice, curprice, portfolio, stock):
+        self.buyprice = buyprice
+        self.curprice = curprice
+        self.portfolio = portfolio
+        self.stock = stock
+
+    def open(self):
+        if self.portfolio > 0:
+            self.buyprice = self.curprice
+            self.stock = self.portfolio / self.buyprice
+            self.portfolio = 0
+            return self.buyprice, self.stock, self.portfolio
+        else:
+            pass
+
+    def shortsell(self):
+        if self.portfolio == 0:
+            self.portfolio = (self.buyprice / self.curprice) * (self.stock * self.buyprice)
+            self.stock = 0
+            self.buyprice = 0
+            return self.buyprice, self.stock, self.portfolio
+        else:
+            pass
+
+    def longsell(self):
+        if self.portfolio == 0:
+            self.portfolio = (self.curprice / self.buyprice) * (self.stock * self.buyprice)
+            self.buyprice = 0
+            self.stock = 0
+            return self.buyprice, self.stock, self.portfolio
+        else:
+            pass
 
 
 tickerscount = int(input())
@@ -34,7 +66,8 @@ for x in range(tickerscount):
     tick = input()
     tick = tick.upper()
     n.append(tick)
-
+print("timeframe in seconds")
+timeframe = int(input())
 for x in n:
     def datagetter(link):
         r = requests.get(link, headers={
@@ -51,17 +84,17 @@ for x in n:
 
     tesla = []
     price = []
-    for x in range(100):
+    for x in range(26):
         price = (datagetter(link))
         price = price.values.tolist()
         tesla.append(price[0])
-        time.sleep(5)
+        time.sleep(timeframe)
         print(x + 1, tesla)
     looper = 1
 
 
     while looper < 2:
-        time.sleep(5)
+        time.sleep(timeframe)
         price = (datagetter(link))
         price = price.values.tolist()
         del tesla[0]
@@ -80,7 +113,7 @@ for x in n:
             except ValueError:
                pass
         print(len(pricelist))
-        pricelist = pricelist[0:100]
+        pricelist = pricelist[0:26]
         pricelist = pricelist[::-1]
 
 
@@ -152,35 +185,13 @@ for x in n:
         for i in range(1):
             x = buyorsell[-1]
             y = pricelist[-1]
-            if x == 2:
-                y = y
-                portfolio = portfolio
-                stock = stock
-            elif x == 0:
-                if shortstock > 0:
-                    portfolio = shortstock * (buyprice * (buyprice / y))
-                    shortstock = 0
-                    stock = portfolio / y
-                    portfolio = 0
-                elif stock == 0:
-                    stock = portfolio / y
-                    portfolio = 0
-                else:
-                    stock = stock
-            elif x == 1:
-                if stock == 0 and portfolio == 0:
-                    portfolio = portfolio
-                else:
-                    if portfolio == 0:
-                        portfolio = stock * y
-                        stock = 0
-                        shortstock = portfolio / y
-                        portfolio = 0
-                        buyprice = y
-                    else:
-                        shortstock = portfolio / y
-                        portfolio = 0
-                        buyprice = y
+
+            action = actions(buyprice, pricelist[-1], portfolio, stock)
+            openpos = actions.open(action)
+            buyprice = openpos[0]
+            stock = openpos[1]
+            portfolio = openpos[2]
+            print(actions.shortsell(action))
 
             z += 1
 
