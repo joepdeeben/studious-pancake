@@ -10,7 +10,7 @@ print('how many tickers?')
 portfolio = 1000
 buyprice = 0
 stock = 0
-
+pos = 2
 class calcs:
     def __init__(self, pricelist, period):
         self.pricelist = pricelist
@@ -26,18 +26,29 @@ class calcs:
         return self.emalist
 
 class actions:
-    def __init__(self, buyprice, curprice, portfolio, stock):
+    def __init__(self, buyprice, curprice, portfolio, stock, pos):
         self.buyprice = buyprice
         self.curprice = curprice
         self.portfolio = portfolio
         self.stock = stock
-
+        self.pos = pos
     def open(self):
         if self.portfolio > 0:
             self.buyprice = self.curprice
             self.stock = self.portfolio / self.buyprice
             self.portfolio = 0
-            return self.buyprice, self.stock, self.portfolio
+            self.pos = 0
+            return self.buyprice, self.stock, self.portfolio, self.pos
+        else:
+            pass
+
+    def openshort(self):
+        if self.portfolio > 0:
+            self.buyprice = self.curprice
+            self.stock = self.portfolio / self.buyprice
+            self.portfolio = 0
+            self.pos = 1
+            return self.buyprice, self.stock, self.portfolio, self.pos
         else:
             pass
 
@@ -46,7 +57,8 @@ class actions:
             self.portfolio = (self.buyprice / self.curprice) * (self.stock * self.buyprice)
             self.stock = 0
             self.buyprice = 0
-            return self.buyprice, self.stock, self.portfolio
+            self.pos = 2
+            return self.buyprice, self.stock, self.portfolio, self.pos
         else:
             pass
 
@@ -55,7 +67,8 @@ class actions:
             self.portfolio = (self.curprice / self.buyprice) * (self.stock * self.buyprice)
             self.buyprice = 0
             self.stock = 0
-            return self.buyprice, self.stock, self.portfolio
+            self.pos = 2
+            return self.buyprice, self.stock, self.portfolio, self.pos
         else:
             pass
 
@@ -159,57 +172,43 @@ for x in n:
         #print(dif)
 
         buyorsell = []
-        print(buyorsell)
         print(l3)
         print(pricelist)
-        for count, (x, y, z) in enumerate(zip(dif, l3, pricelist)):
-            if x > 0 and dif[count - 1] < 0 and z > y:
-                buyorsell.append(0)
-            elif x < 0 and dif[count - 1] > 0 and dif[count - 2] > 0 and z > y:
-                buyorsell.append(1)
-            elif x < 0 and dif[count - 1] > 0 and dif[count - 2] > 0 and z < y:
-                buyorsell.append(1)
-            elif x > 0 and dif[count - 1] < 0 and dif[count - 2] < 0 and dif[count - 3] < 0 and z < y:
-                buyorsell.append(0)
-            else:
-                buyorsell.append(2)
-
-        #print(buyorsell)
-
-        portfoliohistory = []
+        action = actions(buyprice, pricelist[-1], portfolio, stock, pos)
         print(dif)
-        print(buyorsell)
-        print(len(buyorsell))
-        z = 0
-        last = 0
-        for i in range(1):
-            x = buyorsell[-1]
-            y = pricelist[-1]
-
-            action = actions(buyprice, pricelist[-1], portfolio, stock)
+        print(buyprice, pricelist[-1], portfolio, stock, pos)
+        if dif[-2] > 0 and dif[-1] < 0 and pricelist[-1] > l3[-1] and pos == 2:
             openpos = actions.open(action)
             buyprice = openpos[0]
             stock = openpos[1]
             portfolio = openpos[2]
-            print(actions.shortsell(action))
+            pos = openpos[3]
+        elif dif[-2] < 0 and dif[-1] > 0 and pricelist[-1] < l3[-1] and pos == 2:
+            openpos = actions.openshort(action)
+            buyprice = openpos[0]
+            stock = openpos[1]
+            portfolio = openpos[2]
+            pos = openpos[3]
+        elif pos == 0 and (pricelist[-1] / buyprice > 1.01 or pricelist[-1] / buyprice > 0.99):
+            closelong = actions.longsell(action)
+            buyprice = closelong[0]
+            stock = closelong[1]
+            portfolio = closelong[2]
+            pos = closelong[3]
+        elif pos == 1 and (buyprice / pricelist[-1] < 1.01 or buyprice / pricelist[-1] > 0.99):
+            closeshort = actions.shortsell(action)
+            buyprice = closeshort[0]
+            stock = closeshort[1]
+            portfolio = closeshort[2]
+            pos = closeshort[3]
+        else:
+            pass
 
-            z += 1
+        print(buyprice, pricelist[-1], portfolio, stock, pos)
 
-            if portfolio > 0:
-                portfoliohistory.append(portfolio)
-                last = portfolio
-            elif portfolio == 0:
-                if shortstock > 0:
-                    portvalue = shortstock * (buyprice * (buyprice / y))
-                    portfoliohistory.append(portvalue)
-                else:
-                    portvalue = stock * y
-                    portfoliohistory.append(portvalue)
-            print("day", z)
-            print("actie", x)
-            print("hoeveel stocks", stock)
-            print("hoeveelheid shortstocks", shortstock)
-            print("portfolio doeks", portfoliohistory)
+
+        print(portfolio)
+
 
         #x2 = np.array([i for i in range(len(portfoliohistory))])
 
