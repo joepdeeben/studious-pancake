@@ -97,7 +97,7 @@ for x in n:
 
     tesla = []
     price = []
-    for x in range(26):
+    for x in range(50):
         price = (datagetter(link))
         price = price.values.tolist()
         tesla.append(price[0])
@@ -126,7 +126,7 @@ for x in n:
             except ValueError:
                pass
         print(len(pricelist))
-        pricelist = pricelist[0:26]
+        pricelist = pricelist[0:50]
         pricelist = pricelist[::-1]
 
 
@@ -141,7 +141,7 @@ for x in n:
         l2 = list2.ema()
         print(l2)
 
-        #calulates 200 period ema
+        #calulates 50 period ema
         list3 = calcs(pricelist, 50)
         l3 = list3.ema()
         print(l3)
@@ -184,18 +184,18 @@ for x in n:
             portfolio = openpos[2]
             pos = openpos[3]
         elif dif[-2] < 0 and dif[-1] > 0 and pricelist[-1] < l3[-1] and pos == 2:
-            openpos = actions.openshort(action)
-            buyprice = openpos[0]
-            stock = openpos[1]
-            portfolio = openpos[2]
-            pos = openpos[3]
-        elif pos == 0 and (pricelist[-1] / buyprice > 1.01 or pricelist[-1] / buyprice > 0.99):
+            openshort = actions.openshort(action)
+            buyprice = openshort[0]
+            stock = openshort[1]
+            portfolio = openshort[2]
+            pos = openshort[3]
+        elif pos == 0 and (pricelist[-1] / buyprice > 1.0001 or pricelist[-1] / buyprice < 0.99995):
             closelong = actions.longsell(action)
             buyprice = closelong[0]
             stock = closelong[1]
             portfolio = closelong[2]
             pos = closelong[3]
-        elif pos == 1 and (buyprice / pricelist[-1] < 1.01 or buyprice / pricelist[-1] > 0.99):
+        elif pos == 1 and (buyprice / pricelist[-1] < 1.0001 or buyprice / pricelist[-1] > 0.99995):
             closeshort = actions.shortsell(action)
             buyprice = closeshort[0]
             stock = closeshort[1]
@@ -206,7 +206,9 @@ for x in n:
 
         print(buyprice, pricelist[-1], portfolio, stock, pos)
 
-
+    if stock > 0:
+        print(stock * pricelist[-1])
+    else:
         print(portfolio)
 
 
