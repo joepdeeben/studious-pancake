@@ -14,7 +14,7 @@ pos = 2
 class calcs:
     def __init__(self, pricelist, period):
         self.pricelist = pricelist
-        self.k = (2 / period+1)
+        self.k = (2 / (period+1))
         self.emalist = [self.pricelist[0]]
 
     def ema(self):
@@ -112,7 +112,6 @@ for x in n:
         price = price.values.tolist()
         del tesla[0]
         tesla.append(price[0])
-        print(tesla)
 
 
         pricelist = []
@@ -125,9 +124,8 @@ for x in n:
               pricelist.append(str1)
             except ValueError:
                pass
-        print(len(pricelist))
+        print(pricelist)
         pricelist = pricelist[0:50]
-        pricelist = pricelist[::-1]
 
 
 
@@ -142,7 +140,7 @@ for x in n:
         print(l2)
 
         #calulates 50 period ema
-        list3 = calcs(pricelist, 50)
+        list3 = calcs(pricelist, 100)
         l3 = list3.ema()
         print(l3)
 
@@ -162,7 +160,6 @@ for x in n:
             signalline.append(ema2)
 
 
-        signalline = signalline[1:]
         #print(signalline)
         dif = []
         for x, y in zip(macd, signalline):
@@ -171,19 +168,17 @@ for x in n:
 
         #print(dif)
 
-        buyorsell = []
-        print(l3)
-        print(pricelist)
         action = actions(buyprice, pricelist[-1], portfolio, stock, pos)
-        print(dif)
+        print(dif[-1], dif[-2])
+        print(l3[-1])
         print(buyprice, pricelist[-1], portfolio, stock, pos)
-        if dif[-2] > 0 and dif[-1] < 0 and pricelist[-1] > l3[-1] and pos == 2:
+        if dif[-2] < 0 and dif[-1] > 0 and pricelist[-1] > l3[-1] and pos == 2:
             openpos = actions.open(action)
             buyprice = openpos[0]
             stock = openpos[1]
             portfolio = openpos[2]
             pos = openpos[3]
-        elif dif[-2] < 0 and dif[-1] > 0 and pricelist[-1] < l3[-1] and pos == 2:
+        elif dif[-2] > 0 and dif[-1] < 0 and pricelist[-1] < l3[-1] and pos == 2:
             openshort = actions.openshort(action)
             buyprice = openshort[0]
             stock = openshort[1]
