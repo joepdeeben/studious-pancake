@@ -200,7 +200,7 @@ for x in n:
             pass
 
         print(buyprice, pricelist[-1], portfolio, stock, pos)
-
+        print(pricelist[-1] / buyprice)
     if stock > 0:
         print(stock * pricelist[-1])
     else:
