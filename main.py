@@ -169,7 +169,7 @@ for x in n:
         #print(dif)
 
         action = actions(buyprice, pricelist[-1], portfolio, stock, pos)
-        print(dif[-1], dif[-2])
+        print(dif[-2], dif[-1])
         print(l3[-1])
         print(buyprice, pricelist[-1], portfolio, stock, pos)
         if dif[-2] < 0 and dif[-1] > 0 and pricelist[-1] > l3[-1] and pos == 2:
@@ -184,13 +184,13 @@ for x in n:
             stock = openshort[1]
             portfolio = openshort[2]
             pos = openshort[3]
-        elif pos == 0 and (pricelist[-1] / buyprice > 1.0001 or pricelist[-1] / buyprice < 0.99995):
+        elif pos == 0 and (pricelist[-1] / buyprice > 1.0008 or pricelist[-1] / buyprice < 0.9996):
             closelong = actions.longsell(action)
             buyprice = closelong[0]
             stock = closelong[1]
             portfolio = closelong[2]
             pos = closelong[3]
-        elif pos == 1 and (buyprice / pricelist[-1] < 1.0001 or buyprice / pricelist[-1] > 0.99995):
+        elif pos == 1 and (buyprice / pricelist[-1] < 1.0008 or buyprice / pricelist[-1] > 0.9996):
             closeshort = actions.shortsell(action)
             buyprice = closeshort[0]
             stock = closeshort[1]
