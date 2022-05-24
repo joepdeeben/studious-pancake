@@ -6,7 +6,7 @@ from scipy.interpolate import make_interp_spline, BSpline
 import time, random
 
 n = []
-portfolio = 1000
+portfolio = 1007.1
 buyprice = 0
 stock = 0
 pos = 2
@@ -82,9 +82,11 @@ user_agent_list = [
 
 print('take profit at what percentage?')
 takeprofitpercent = float(input())
+print("risk to reward? (enter risk, reward is set to 1")
+rr = float(input())
 takeprofitpercent = takeprofitpercent / 100
 takeprofit = 1 + takeprofitpercent
-takeloss = 1 - takeprofitpercent
+takeloss = 1 - takeprofitpercent / rr
 print(takeprofit, takeloss)
 print('how many tickers?')
 tickerscount = int(input())
@@ -113,7 +115,7 @@ link = link.replace("TSLA", tick)
 
 tesla = []
 price = []
-for x in range(50):
+for x in range(200):
     price = (datagetter(link))
     price = price.values.tolist()
     tesla.append(price[0])
@@ -141,7 +143,7 @@ while looper < 2:
         except ValueError:
            pass
     print(pricelist)
-    pricelist = pricelist[0:50]
+    pricelist = pricelist[0:200]
 
 
 
@@ -156,7 +158,7 @@ while looper < 2:
     print(l2)
 
     #calulates 50 period ema
-    list3 = calcs(pricelist, 100)
+    list3 = calcs(pricelist, 200)
     l3 = list3.ema()
     print(l3)
 
