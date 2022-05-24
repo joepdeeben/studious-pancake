@@ -95,13 +95,16 @@ for x in range(tickerscount):
 print("timeframe in seconds")
 timeframe = int(input())
 def datagetter(link):
-    user_agent = random.choice(user_agent_list)
-    headers = {'User-Agent': user_agent}
-    r = requests.get(link, headers = headers)
-    data = pd.read_html(r.text)
-    data = data[0]
-    close = data[['Close*']]
-    return close
+    try:
+        user_agent = random.choice(user_agent_list)
+        headers = {'User-Agent': user_agent}
+        r = requests.get(link, headers=headers)
+        data = pd.read_html(r.text)
+        data = data[0]
+        close = data[['Close*']]
+        return close
+    except ConnectionResetError:
+        return pricelist[-1]
 
 
 link = 'https://finance.yahoo.com/quote/TSLA/history?p=TSLA'
