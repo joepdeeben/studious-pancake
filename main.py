@@ -10,6 +10,7 @@ portfolio = 1007.1
 buyprice = 0
 stock = 0
 pos = 2
+portfoliohistory = []
 class calcs:
     def __init__(self, pricelist, period):
         self.pricelist = pricelist
@@ -105,7 +106,7 @@ def datagetter(link):
         data = data[0]
         close = data[['Close*']]
         return close
-    except ConnectionResetError:
+    except ConnectionResetError or ChunkedEncodingError:
         return pricelist[-1]
 
 
@@ -217,34 +218,47 @@ while looper < 2:
     else:
         pass
 
+
+
+
     print(buyprice, pricelist[-1], portfolio, stock, pos)
     if stock > 0:
-       print(pricelist[-1] / buyprice)
-       print(stock * pricelist[-1])
+        if pos == 1:
+            print(buyprice / pricelist[-1])
+            print((buyprice / pricelist[-1]) * stock)
+        elif pos == 0:
+            print(pricelist[-1] / buyprice)
+            print((pricelist[-1] / buyprice) * stock)
     else:
        print(portfolio)
+       portfoliohistory.append(portfolio)
+    print(portfoliohistory)
 
 
-    #x2 = np.array([i for i in range(len(portfoliohistory))])
-
-    profit = []
-
-    #for x in portfoliohistory:
-        #profit.append(x)
-
-    #print(portfoliohistory)
-    # X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
+    # if len(portfoliohistory) > 4:
+    #     x2 = np.array([i for i in range(len(portfoliohistory))])
     #
-    # X_2 = np.linspace(x2.min(), x2.max(), 50)
-    # Y_2 = X_Y_Spline2(X_2)
+    #     profit = []
     #
-    # X_Y_Spline3 = make_interp_spline(x2, profit)
+    #     for x in portfoliohistory:
+    #         profit.append(x)
     #
-    # Y_3 = X_Y_Spline3(X_2)
+    #     print(portfoliohistory)
+    #     X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
     #
-    # plt.plot(X_2, Y_2)
-    # plt.plot(X_2, Y_3)
-    # plt.legend(n)
-    # plt.show()
+    #     X_2 = np.linspace(x2.min(), x2.max(), 50)
+    #     Y_2 = X_Y_Spline2(X_2)
+    #
+    #     X_Y_Spline3 = make_interp_spline(x2, profit)
+    #
+    #     Y_3 = X_Y_Spline3(X_2)
+    #
+    #     plt.plot(X_2, Y_2)
+    #     plt.plot(X_2, Y_3)
+    #     plt.legend(n)
+    #     plt.show()
+    #     plt.close()
+    # else:
+    #     pass
 
 
