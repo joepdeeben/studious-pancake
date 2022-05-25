@@ -10,6 +10,7 @@ portfolio = 1000
 buyprice = 0
 stock = 0
 pos = 2
+portfoliohistory = []
 class calcs:
     def __init__(self, pricelist, period):
         self.pricelist = pricelist
@@ -103,7 +104,7 @@ def datagetter(link):
         data = data[0]
         close = data[['Close*']]
         return close
-    except ConnectionResetError:
+    except ConnectionResetError or ChunkedEncodingError:
         return pricelist[-1]
 
 
@@ -113,7 +114,7 @@ link = link.replace("TSLA", tick)
 
 tesla = []
 price = []
-for x in range(50):
+for x in range(200):
     price = (datagetter(link))
     price = price.values.tolist()
     tesla.append(price[0])
@@ -141,7 +142,7 @@ while looper < 2:
         except ValueError:
            pass
     print(pricelist)
-    pricelist = pricelist[0:50]
+    pricelist = pricelist[0:200]
 
 
 
@@ -156,7 +157,7 @@ while looper < 2:
     print(l2)
 
     #calulates 50 period ema
-    list3 = calcs(pricelist, 100)
+    list3 = calcs(pricelist, 200)
     l3 = list3.ema()
     print(l3)
 
@@ -206,7 +207,7 @@ while looper < 2:
         stock = closelong[1]
         portfolio = closelong[2]
         pos = closelong[3]
-    elif pos == 1 and (buyprice / pricelist[-1] < takeprofit or buyprice / pricelist[-1] > takeloss):
+    elif pos == 1 and (buyprice / pricelist[-1] > takeprofit or buyprice / pricelist[-1] < takeloss):
         closeshort = actions.shortsell(action)
         buyprice = closeshort[0]
         stock = closeshort[1]
@@ -215,34 +216,47 @@ while looper < 2:
     else:
         pass
 
+
+
+
     print(buyprice, pricelist[-1], portfolio, stock, pos)
     if stock > 0:
-       print(pricelist[-1] / buyprice)
-       print(stock * pricelist[-1])
+        if pos == 1:
+            print(buyprice / pricelist[-1])
+            print((buyprice / pricelist[-1]) * stock)
+        elif pos == 0:
+            print(pricelist[-1] / buyprice)
+            print((pricelist[-1] / buyprice) * stock)
     else:
        print(portfolio)
+       portfoliohistory.append(portfolio)
+    print(portfoliohistory)
 
 
-    #x2 = np.array([i for i in range(len(portfoliohistory))])
-
-    profit = []
-
-    #for x in portfoliohistory:
-        #profit.append(x)
-
-    #print(portfoliohistory)
-    # X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
+    # if len(portfoliohistory) > 4:
+    #     x2 = np.array([i for i in range(len(portfoliohistory))])
     #
-    # X_2 = np.linspace(x2.min(), x2.max(), 50)
-    # Y_2 = X_Y_Spline2(X_2)
+    #     profit = []
     #
-    # X_Y_Spline3 = make_interp_spline(x2, profit)
+    #     for x in portfoliohistory:
+    #         profit.append(x)
     #
-    # Y_3 = X_Y_Spline3(X_2)
+    #     print(portfoliohistory)
+    #     X_Y_Spline2 = make_interp_spline(x2, portfoliohistory)
     #
-    # plt.plot(X_2, Y_2)
-    # plt.plot(X_2, Y_3)
-    # plt.legend(n)
-    # plt.show()
+    #     X_2 = np.linspace(x2.min(), x2.max(), 50)
+    #     Y_2 = X_Y_Spline2(X_2)
+    #
+    #     X_Y_Spline3 = make_interp_spline(x2, profit)
+    #
+    #     Y_3 = X_Y_Spline3(X_2)
+    #
+    #     plt.plot(X_2, Y_2)
+    #     plt.plot(X_2, Y_3)
+    #     plt.legend(n)
+    #     plt.show()
+    #     plt.close()
+    # else:
+    #     pass
 
 
