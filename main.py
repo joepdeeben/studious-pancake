@@ -82,7 +82,7 @@ user_agent_list = [
 
 print('take profit at what percentage?')
 takeprofitpercent = float(input())
-print("risk to reward? (enter risk, reward is set to 1")
+print("risk to reward? (enter risk, reward is set to 1)")
 rr = float(input())
 takeprofitpercent = takeprofitpercent / 100
 takeprofit = 1 + takeprofitpercent
@@ -208,7 +208,7 @@ while looper < 2:
         stock = closelong[1]
         portfolio = closelong[2]
         pos = closelong[3]
-    elif pos == 1 and (buyprice / pricelist[-1] < takeprofit or buyprice / pricelist[-1] > takeloss):
+    elif pos == 1 and (buyprice / pricelist[-1] > takeprofit or buyprice / pricelist[-1] < takeloss):
         closeshort = actions.shortsell(action)
         buyprice = closeshort[0]
         stock = closeshort[1]
