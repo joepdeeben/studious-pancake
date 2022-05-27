@@ -4,7 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline, BSpline
 import time, random
+from ib_insync import *
+import dataclasses
+ib = IB()
+ib.connect('127.0.0.1', 7497, clientId=1)
 
+contract = Crypto('BTC', 'PAXOS', 'USD')
 n = []
 portfolio = 1007.1
 buyprice = 0
