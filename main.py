@@ -7,9 +7,13 @@ import time, random
 from ib_insync import *
 import dataclasses
 ib = IB()
-ib.connect('127.0.0.1', 7497, clientId=1)
+ib.connect('127.0.0.1', 7496, clientId=1)
 
 contract = Crypto('BTC', 'PAXOS', 'USD')
+data = ib.reqMktData(contract)
+ib.sleep(5)
+print(data.close)
+
 n = []
 portfolio = 1007.1
 buyprice = 0
