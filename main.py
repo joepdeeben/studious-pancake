@@ -10,9 +10,7 @@ ib = IB()
 ib.connect('127.0.0.1', 7496, clientId=1)
 
 contract = Crypto('BTC', 'PAXOS', 'USD')
-data = ib.reqMktData(contract)
-ib.sleep(5)
-print(data.close)
+
 
 n = []
 portfolio = 1007.1
@@ -90,6 +88,9 @@ user_agent_list = [
 ]
 
 
+
+tesla = []
+
 print('take profit at what percentage?')
 takeprofitpercent = float(input())
 print("risk to reward? (enter risk, reward is set to 1)")
@@ -106,52 +107,37 @@ for x in range(tickerscount):
     tick = tick.upper()
 print("timeframe in seconds")
 timeframe = int(input())
-def datagetter(link):
-    try:
-        user_agent = random.choice(user_agent_list)
-        headers = {'User-Agent': user_agent}
-        r = requests.get(link, headers=headers)
-        data = pd.read_html(r.text)
-        data = data[0]
-        close = data[['Close*']]
-        return close
-    except ConnectionResetError or ChunkedEncodingError:
-        return pricelist[-1]
+histdata = ib.reqHistoricalData(contract, endDateTime= '', durationStr= '6000 S', barSizeSetting= '30 secs', useRTH=1, whatToShow= 'MIDPOINT')
+df = util.df(histdata)
+df = df['close']
+print(df)
+for x in df:
+    tesla.append(x)
+
+print(tesla)
+def datagetter(contract):
+        data = ib.reqMktData(contract)
+        ib.sleep(timeframe)
+        return data.marketPrice()
 
 
-link = 'https://finance.yahoo.com/quote/TSLA/history?p=TSLA'
-link = link.replace("TSLA", tick)
 
 
-tesla = []
 price = []
-for x in range(200):
-    price = (datagetter(link))
-    price = price.values.tolist()
-    tesla.append(price[0])
-    time.sleep(timeframe)
-    print(x + 1, tesla)
 looper = 1
 
 
 while looper < 2:
-    time.sleep(timeframe)
-    price = (datagetter(link))
-    price = price.values.tolist()
+    price = (datagetter(contract))
     del tesla[0]
-    tesla.append(price[0])
+    tesla.append(price)
 
 
     pricelist = []
 
 
     for count, x in enumerate(tesla):
-        str1 = ''.join(x)
-        try:
-          str1 = float(str1)
-          pricelist.append(str1)
-        except ValueError:
-           pass
+        pricelist.append(x)
     print(pricelist)
     pricelist = pricelist[0:200]
 
